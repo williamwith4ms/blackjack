@@ -1,7 +1,7 @@
 public class Card {
     private final String suit;
     private final String rank;
-    private final int value;
+    private int value;
     private boolean faceUp;
 
     public Card(String suit, String rank) {
@@ -27,6 +27,10 @@ public class Card {
         } else {
             return Integer.parseInt(rank);
         }
+    }
+
+    public void updateValue(int num) {
+        value = num;
     }
 
     public boolean isFaceUp() {
