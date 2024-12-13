@@ -39,11 +39,14 @@ public class Deck {
         }
     }
 
-    public Card dealCard() {
+    public Card dealCard(boolean faceUp) {
         Card card = remaingCards[0];
         Card[] tempCards = new Card[remaingCards.length - 1];
         System.arraycopy(remaingCards, 1, tempCards, 0, remaingCards.length - 1);
         remaingCards = tempCards;
+        if (faceUp) {
+            card.reveal();
+        }
         return card;
     }
 
