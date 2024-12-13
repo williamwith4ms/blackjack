@@ -42,24 +42,21 @@ public class Game {
         System.out.println("Player's hand:");
         player.printHand();
 
-        System.out.println("Dealer's hand:");
+        System.out.println("\nDealer's hand:");
         dealer.printHand();
         dealer.calculateHandTotal();
-        System.out.println("Dealer's hand total: " + dealer.handTotal);
 
         player.calculateHandTotal();
-        System.out.println("Player's hand total: " + player.handTotal);
-
-        System.out.println("Would you like to hit? (y/n)");
+        System.out.println("\nWould you like to hit? (y/n)");
         String hit = scanner.nextLine();
 
         // Player's turn
-        playersTurn(player, deck, scanner, hit);
+        playersTurn(player, deck, scanner, hit, dealer);
 
         // skip if bust
 
         if (!player.bust) {
-            dealersTurn(dealer, deck);
+            dealersTurn(dealer, deck, player);
         }
 
         determineWinner(dealer, player, deck);
@@ -80,36 +77,43 @@ public class Game {
         }
     }
 
-    private static void dealersTurn(Player dealer, Deck deck) {
+    private static void dealersTurn(Player dealer, Deck deck, Player player) {
         while (dealer.handTotal < 17) {
             dealer.hand.get(1).reveal();
             dealer.hit(deck);
-            dealer.printHand();
+            printGameState(player, dealer);
 
-            System.out.println("Dealer's hand total: " + dealer.handTotal);
             if (dealer.handTotal > 21) {
-                System.out.println("Dealer busts!");
+                System.out.println("\nDealer busts!");
                 dealer.bust = true;
                 break;
             }
         }
     }
 
-    private static void playersTurn(Player player, Deck deck, Scanner scanner, String hit) {
+    private static void playersTurn(Player player, Deck deck, Scanner scanner, String hit, Player dealer) {
         while (hit.equals("y")) {
             player.hit(deck);
-            player.printHand();
             player.calculateHandTotal();
-            System.out.println("Player's hand total: " + player.handTotal);
+            printGameState(player, dealer);
             if (player.handTotal > 21) {
                 // check for aces
-                System.out.println("Player busts!");
+                System.out.println("\nPlayer busts!");
                 player.bust = true;
                 break;
             }
-            System.out.println("Would you like to hit? (y/n)");
+            System.out.println("\nWould you like to hit? (y/n)");
             hit = scanner.nextLine();
         }
+    }
+
+    private static void printGameState(Player player, Player dealer) {
+        System.out.println("Player's hand:");
+        player.printHand();
+
+        System.out.println("\nDealer's hand:");
+        dealer.printHand();
+        dealer.calculateHandTotal();
     }
 
 
@@ -132,7 +136,11 @@ class Player {
 
     public void printHand() {
         for (Card card : hand) {
-            System.out.println(card);
+            if (!card.isFaceUp()) {
+                System.out.print("Hidden card");
+            } else {
+                System.out.print(card);
+            }
         }
     }
 

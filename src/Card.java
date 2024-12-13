@@ -44,10 +44,10 @@ public class Card {
     public String toString() {
         String facing = (faceUp ? "(Up)" : "(Down)");
         return switch (suit) {
-            case "Hearts" -> rank + "♥" + " " + facing;
-            case "Diamonds" -> rank + "♦" + " " + facing;
-            case "Clubs" -> rank + "♣" + " " + facing;
-            case "Spades" -> rank + "♠" + " " + facing;
+            case "Hearts" -> rank + "♥" + " ";
+            case "Diamonds" -> rank + "♦" + " ";
+            case "Clubs" -> rank + "♣" + " ";
+            case "Spades" -> rank + "♠" + " ";
             default -> "Invalid suit";
         };
     }
