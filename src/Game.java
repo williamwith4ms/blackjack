@@ -2,14 +2,41 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Game {
+
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Deck deck = new Deck();
+        Deck deck = new Deck(6);
         deck.shuffle();
 
-        Player player = new Player();
-        Dealer dealer = new Dealer();
 
+        Dealer dealer = new Dealer();
+        Player player = new Player();
+
+
+        while (true) {
+
+            if (deck.numCards < 52) {
+                deck = new Deck(6);
+                deck.shuffle();
+                System.out.println("deck low on cards, reshuffling");
+            }
+
+            round(player, dealer, deck, scanner);
+            System.out.println("Would you like to play again? (y/n)");
+            String playAgain = scanner.nextLine();
+
+            if (playAgain.equals("n")) {
+                break;
+            }
+
+            player.hand.clear();
+            dealer.hand.clear();
+        }
+
+    }
+
+    private static void round(Player player, Dealer dealer, Deck deck, Scanner scanner) {
         dealCard(player, dealer, deck);
 
         System.out.println("Player's hand:");
@@ -26,8 +53,49 @@ public class Game {
         System.out.println("Would you like to hit? (y/n)");
         String hit = scanner.nextLine();
 
-
         // Player's turn
+        playersTurn(player, deck, scanner, hit);
+
+        // skip if bust
+
+        if (!player.bust) {
+            dealersTurn(dealer, deck);
+        }
+
+        determineWinner(dealer, player, deck);
+    }
+
+    private static void determineWinner(Dealer dealer, Player player, Deck deck) {
+        // i love if statements
+        if (player.bust) {
+            System.out.println("Dealer wins!");
+        } else if (dealer.bust) {
+            System.out.println("Player wins!");
+        } else if (player.handTotal > dealer.handTotal) {
+            System.out.println("Player wins!");
+        } else if (dealer.handTotal > player.handTotal) {
+            System.out.println("Dealer wins!");
+        } else {
+            System.out.println("It's a tie!");
+        }
+    }
+
+    private static void dealersTurn(Dealer dealer, Deck deck) {
+        while (dealer.handTotal < 17) {
+            dealer.hand.get(1).reveal();
+            dealer.hit(deck);
+            dealer.printHand();
+
+            System.out.println("Dealer's hand total: " + dealer.handTotal);
+            if (dealer.handTotal > 21) {
+                System.out.println("Dealer busts!");
+                dealer.bust = true;
+                break;
+            }
+        }
+    }
+
+    private static void playersTurn(Player player, Deck deck, Scanner scanner, String hit) {
         while (hit.equals("y")) {
             player.hit(deck);
             player.printHand();
@@ -41,38 +109,8 @@ public class Game {
             System.out.println("Would you like to hit? (y/n)");
             hit = scanner.nextLine();
         }
-
-        // dealer's turn
-        while (dealer.handTotal < 17) {
-            dealer.hit(deck);
-            System.out.println("Dealer's hand total: " + dealer.handTotal);
-            if (dealer.handTotal > 21) {
-                System.out.println("Dealer busts!");
-                dealer.bust = true;
-                break;
-            }
-        }
-
-        // determine winner
-
-        if (player.bust) {
-            System.out.println("Dealer wins!");
-        } else if (dealer.bust) {
-            System.out.println("Player wins!");
-        } else if (player.handTotal > dealer.handTotal) {
-            System.out.println("Player wins!");
-        } else if (dealer.handTotal > player.handTotal) {
-            System.out.println("Dealer wins!");
-        } else {
-            System.out.println("It's a tie!");
-        }
-
-
-
-
-
-
     }
+
 
     public static void dealCard(Player player, Dealer dealer, Deck deck) {
         player.hand.add(deck.dealCard(true));
@@ -108,8 +146,6 @@ class Player {
         hand.add(deck.dealCard(true));
         calculateHandTotal();
     }
-
-
 
 }
 
