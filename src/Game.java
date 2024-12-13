@@ -10,7 +10,7 @@ public class Game {
         deck.shuffle();
 
 
-        Dealer dealer = new Dealer();
+        Player dealer = new Player();
         Player player = new Player();
 
 
@@ -36,7 +36,7 @@ public class Game {
 
     }
 
-    private static void round(Player player, Dealer dealer, Deck deck, Scanner scanner) {
+    private static void round(Player player, Player dealer, Deck deck, Scanner scanner) {
         dealCard(player, dealer, deck);
 
         System.out.println("Player's hand:");
@@ -65,7 +65,7 @@ public class Game {
         determineWinner(dealer, player, deck);
     }
 
-    private static void determineWinner(Dealer dealer, Player player, Deck deck) {
+    private static void determineWinner(Player dealer, Player player, Deck deck) {
         // i love if statements
         if (player.bust) {
             System.out.println("Dealer wins!");
@@ -80,7 +80,7 @@ public class Game {
         }
     }
 
-    private static void dealersTurn(Dealer dealer, Deck deck) {
+    private static void dealersTurn(Player dealer, Deck deck) {
         while (dealer.handTotal < 17) {
             dealer.hand.get(1).reveal();
             dealer.hit(deck);
@@ -102,6 +102,7 @@ public class Game {
             player.calculateHandTotal();
             System.out.println("Player's hand total: " + player.handTotal);
             if (player.handTotal > 21) {
+                // check for aces
                 System.out.println("Player busts!");
                 player.bust = true;
                 break;
@@ -112,7 +113,7 @@ public class Game {
     }
 
 
-    public static void dealCard(Player player, Dealer dealer, Deck deck) {
+    public static void dealCard(Player player, Player dealer, Deck deck) {
         player.hand.add(deck.dealCard(true));
         dealer.hand.add(deck.dealCard(true));
         player.hand.add(deck.dealCard(true));
@@ -140,43 +141,24 @@ class Player {
         for (Card card : hand) {
             handTotal += card.getValue();
         }
-    }
 
-    public void hit(Deck deck) {
-        hand.add(deck.dealCard(true));
-        calculateHandTotal();
-    }
-
-}
-
-class Dealer {
-    ArrayList<Card> hand = new ArrayList<Card>();
-    int handTotal = 0;
-    boolean bust = false;
-
-    Dealer() {
-        hand = new ArrayList<Card>();
-    }
-
-    public void printHand() {
-        for (Card card : hand) {
-            if (card.isFaceUp()) {
-                System.out.println(card);
-            } else {
-                System.out.println("Card is face down");
+        if (handTotal > 21) {
+            for (Card card : hand) {
+                if (card.getRank().equals("Ace")) {
+                    card.updateValue(1);
+                    handTotal -= 10;
+                    if (handTotal <= 21) {
+                        break;
+                    }
+                }
             }
         }
-    }
 
-    public void calculateHandTotal() {
-        handTotal = 0;
-        for (Card card : hand) {
-            handTotal += card.getValue();
-        }
     }
 
     public void hit(Deck deck) {
         hand.add(deck.dealCard(true));
         calculateHandTotal();
     }
+
 }
